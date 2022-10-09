@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import './App.css';
-import Todotable from './components/Todolist';
+import { AgGridReact } from'ag-grid-react'
+import'ag-grid-community/dist/styles/ag-grid.css'
+import'ag-grid-community/dist/styles/ag-theme-material.css';
+import { useRef } from 'react';
 
 function App() {
   const [todo, setTodo] = useState({desc: '', date: ''});
   const [todos, setTodos] = useState([]);
+  const gridRef = useRef();
 
   const inputChanged = (event) => {
     setTodo({...todo, [event.target.name]: event.target.value});
@@ -15,7 +19,24 @@ function App() {
     setTodos([...todos, todo]);
 
   }
+  const deleteTodo = () => {
+    if (gridRef.current.getSelectedNodes().length > 0) {
+       setTodos(todos.filter((todo, index) => 
+        index !== gridRef.current.getSelectedNodes()[0].childIndex))
+    }
 
+  else {
+    alert('Select row first');
+  }}
+  
+  const columns = [
+    {headerName: 'Date', field: 'date', filter: true, floatingFilter: true, sortable: true,},
+
+    {headerName: 'Description', field: 'desc', filter: true, floatingFilter: true, sortable: true,},
+
+    {headerName: 'Priority', field: 'priority', filter: true, floatingFilter: true, sortable: true, 
+      cellStyle: params => params.value === "High" ? {color: 'red'} : {color: 'black'}}
+  ]
 
   return (
     <div className="App">
@@ -26,12 +47,27 @@ function App() {
 
           <label htmlForm="desc">Description: </label>
           <input type="text" name="desc" value={todo.desc} onChange={inputChanged} />
-          
+
+          <label htmlForm="desc">Priority: </label>
+          <input type="text" name="priority" value={todo.priority} onChange={inputChanged} />
+
           <input type="submit" value="Add" />
+          
+          <button onClick={deleteTodo}>Delete</button>
+        <div className="ag-theme-material"style={{height: '700px', width: '70%', margin: 'auto'}} >
+          <AgGridReact
+        columnDefs={columns}
+        rowData={todos}
+        animtateRows={true}
+        rowSelection="single"
+        ref={gridRef}
+        onGridReady={ params => gridRef.current = params.api }>
+          </AgGridReact>
+        </div>
+    
       </form>
-      <Todotable todos={todos}/>
     </div>
   );
-}
+  }
 
 export default App;
