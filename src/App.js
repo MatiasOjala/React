@@ -4,6 +4,10 @@ import { AgGridReact } from'ag-grid-react'
 import'ag-grid-community/dist/styles/ag-grid.css'
 import'ag-grid-community/dist/styles/ag-theme-material.css';
 import { useRef } from 'react';
+import {  BrowserRouter,  Routes,  Route,  Link} from"react-router-dom";
+import Home from './components/Home';  
+import Contact from './components/Contact';  
+import About from './components/About'; 
 
 function App() {
   const [todo, setTodo] = useState({desc: '', date: ''});
@@ -36,12 +40,25 @@ function App() {
 
     {headerName: 'Priority', field: 'priority', filter: true, floatingFilter: true, sortable: true, 
       cellStyle: params => params.value === "High" ? {color: 'red'} : {color: 'black'}}
-  ]
+  ] 
+
 
   return (
     <div className="App">
       <form onSubmit={addTodo}>
         <h1>Todolist</h1>
+        <div>
+        <BrowserRouter>
+    <Link to="/">Home</Link>{' '}
+    <Link to="/about">About</Link>{' '}
+    <Link to="/contact">Contact</Link>{' '}
+    <Routes>
+      <Route exact path="/" element={<Home />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/contact" element={<Contact />} />
+    </Routes>
+  </BrowserRouter>
+  </div>
         <label htmlForm="date">Date: </label>
           <input type="date" name="date" value={todo.date} onChange={inputChanged} />
 
@@ -64,7 +81,6 @@ function App() {
         onGridReady={ params => gridRef.current = params.api }>
           </AgGridReact>
         </div>
-    
       </form>
     </div>
   );
